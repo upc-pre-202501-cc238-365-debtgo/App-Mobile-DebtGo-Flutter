@@ -1,9 +1,43 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _email = 'usuario@correo.com';
+  String _phone = '+51 987 654 321';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final email = prefs.getString('email') ?? 'usuario@correo.com';
+    var phone = prefs.getString('phone');
+
+    // Si no hay un teléfono guardado, genera uno aleatorio
+    if (phone == null) {
+      final random = Random();
+      phone = '+51 9${1000000 + random.nextInt(8999999)}';
+      await prefs.setString('phone', phone);
+    }
+
+    setState(() {
+      _email = email;
+      _phone = phone!;
+    });
+  }
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,15 +60,15 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Divider(),
-          const ListTile(
-            leading: Icon(Icons.email),
-            title: Text('Correo electrónico'),
-            subtitle: Text('usuario@correo.com'),
+          ListTile(
+            leading: const Icon(Icons.email),
+            title: const Text('Correo electrónico'),
+            subtitle: Text(_email),
           ),
-          const ListTile(
-            leading: Icon(Icons.phone),
-            title: Text('Teléfono'),
-            subtitle: Text('+51 987 654 321'),
+          ListTile(
+            leading: const Icon(Icons.phone),
+            title: const Text('Teléfono'),
+            subtitle: Text(_phone),
           ),
           const ListTile(
             leading: Icon(Icons.settings),

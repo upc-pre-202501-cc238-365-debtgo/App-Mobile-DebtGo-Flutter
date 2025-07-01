@@ -4,8 +4,6 @@ import 'core/theme.dart';
 import 'routes/app_routes.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_PE', null);
@@ -19,12 +17,11 @@ class DebtGoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey,
       title: 'DebtGo',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
       initialRoute: AppRoutes.splash,
-      routes: AppRoutes.routes,
+      routes: AppRoutes.routes
     );
   }
 }

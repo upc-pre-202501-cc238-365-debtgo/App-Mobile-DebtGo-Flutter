@@ -23,13 +23,13 @@ class NotificationService {
 
     await _notifications.initialize(
       settings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
         print("🔔 TAP en notificación: payload = ${response.payload}");
         if (response.payload == 'open_notifications') {
-          navigatorKey.currentState?.pushNamed(AppRoutes.notifications);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('navigateToNotifications', true);
         }
       },
-      // Aún puedes declarar esto aunque no navegues aquí
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
@@ -71,3 +71,4 @@ class NotificationService {
     );
   }
 }
+

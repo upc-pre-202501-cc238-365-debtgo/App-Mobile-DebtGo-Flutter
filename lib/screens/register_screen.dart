@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
@@ -25,9 +26,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     await Future.delayed(const Duration(seconds: 1));
 
     final prefs = await SharedPreferences.getInstance();
+
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+
+    final randomPhone = '+51 9${1000000 + Random().nextInt(8999999)}';
+
     await prefs.setBool('is_logged', true);
-    await prefs.setString('name', _nameController.text.trim());
-    await prefs.setString('email', _emailController.text.trim());
+    await prefs.setString('name', name);
+    await prefs.setString('email', email);
+    await prefs.setString('phone', randomPhone);
 
     if (mounted) {
       setState(() => _loading = false);

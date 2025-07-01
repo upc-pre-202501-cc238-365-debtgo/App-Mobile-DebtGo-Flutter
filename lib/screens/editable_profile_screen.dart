@@ -1,120 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../routes/app_routes.dart';
 
-class EditableProfileScreen extends StatefulWidget {
+class EditableProfileScreen extends StatelessWidget {
   const EditableProfileScreen({super.key});
 
-  @override
-  State<EditableProfileScreen> createState() => _EditableProfileScreenState();
-}
-
-class _EditableProfileScreenState extends State<EditableProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
+  Future<Map<String, String>> _loadProfile() async {
     final prefs = await SharedPreferences.getInstance();
-    _nameController.text = prefs.getString('name') ?? '';
-    _emailController.text = prefs.getString('email') ?? '';
-    _phoneController.text = prefs.getString('phone') ?? '';
+    return {
+      'email': prefs.getString('email') ?? 'usuario@correo.com',
+      'phone': prefs.getString('phone') ?? '+51 987 654 321',
+    };
   }
 
-  Future<void> _saveUserProfile() async {
-    if (_formKey.currentState!.validate()) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('name', _nameController.text.trim());
-      await prefs.setString('email', _emailController.text.trim());
-      await prefs.setString('phone', _phoneController.text.trim());
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Perfil actualizado correctamente')),
-      );
-    }
-  }
-
-  String? _validateName(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Ingrese su nombre';
-    if (value.trim().length < 3) return 'Mínimo 3 caracteres';
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Ingrese su correo';
-    final regex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!regex.hasMatch(value.trim())) return 'Correo no válido';
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Ingrese su teléfono';
-    final regex = RegExp(r'^\+?[0-9]{7,15}$');
-    if (!regex.hasMatch(value.trim())) return 'Número no válido';
-    return null;
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (_) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Perfil')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
+      appBar: AppBar(title: const Text('Mi Perfil')),
+      body: FutureBuilder<Map<String, String>>(
+        future: _loadProfile(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final data = snapshot.data!;
+          final email = data['email']!;
+          final phone = data['phone']!;
+
+          return ListView(
+            padding: const EdgeInsets.all(24),
             children: [
-              const Icon(Icons.edit, size: 80, color: Colors.indigo),
-              const SizedBox(height: 24),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre completo',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+              const Center(
+                child: CircleAvatar(
+                  radius: 45,
+                  child: Icon(Icons.person, size: 45),
                 ),
-                validator: _validateName,
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                validator: _validateEmail,
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.email),
+                title: const Text('Correo electrónico'),
+                subtitle: Text(email),
               ),
+              ListTile(
+                leading: const Icon(Icons.phone),
+                title: const Text('Teléfono'),
+                subtitle: Text(phone),
+              ),
+              const ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Configuración'),
+                subtitle: Text('Notificaciones, privacidad, idioma'),
+              ),
+              const Divider(),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: 'Teléfono',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
-                ),
-                validator: _validatePhone,
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _saveUserProfile,
-                  icon: const Icon(Icons.save),
-                  label: const Text('Guardar cambios'),
+              ElevatedButton.icon(
+                onPressed: () => _logout(context),
+                icon: const Icon(Icons.logout),
+                label: const Text('Cerrar sesión'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size.fromHeight(50),
                 ),
               ),
+              const SizedBox(height: 12),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }

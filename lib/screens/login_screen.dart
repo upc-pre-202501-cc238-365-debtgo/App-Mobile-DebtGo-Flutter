@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
@@ -20,16 +21,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-
-    // Simulación de autenticación (puedes reemplazar con lógica real)
     await Future.delayed(const Duration(seconds: 1));
 
     final prefs = await SharedPreferences.getInstance();
-
-    // Simulación de recuperar nombre según correo
     final email = _emailController.text.trim();
-    String name = prefs.getString('name') ?? '';
 
+    // Simulación de nombre basado en correo
+    String name = prefs.getString('name') ?? '';
     if (name.isEmpty) {
       if (email.toLowerCase().contains('daniel')) {
         name = 'Daniel';
@@ -38,8 +36,14 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         name = email.split('@').first.capitalize();
       }
-
       await prefs.setString('name', name);
+    }
+
+    // Genera número solo si no existe
+    String? phone = prefs.getString('phone');
+    if (phone == null) {
+      phone = '+51 9${1000000 + Random().nextInt(8999999)}';
+      await prefs.setString('phone', phone);
     }
 
     await prefs

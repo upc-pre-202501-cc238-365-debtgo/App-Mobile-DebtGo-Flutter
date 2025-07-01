@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
-import '../services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,18 +15,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   final List<Map<String, dynamic>> options = [
     {
-      'title': 'Emprendedores',
-      'subtitle': 'Recursos y ayuda',
-      'icon': Icons.business,
-      'route': AppRoutes.entrepreneurs,
-    },
-    {
-      'title': 'Gestión de Deudas',
-      'subtitle': 'Vencimientos y pagos',
-      'icon': Icons.account_balance_wallet,
-      'route': AppRoutes.debtManagement,
-    },
-    {
       'title': 'Perfil',
       'subtitle': 'Tus datos',
       'icon': Icons.person,
@@ -40,28 +27,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'route': AppRoutes.reviews,
     },
     {
-      'title': 'Mensajes',
-      'subtitle': 'Consulta con asesor',
-      'icon': Icons.chat,
-      'route': AppRoutes.messages,
+      'title': 'Buscar Consultores',
+      'subtitle': 'Filtra por rubro',
+      'icon': Icons.search,
+      'route': AppRoutes.consultantSearch,
     },
     {
-      'title': 'Planes y suscripción',
-      'subtitle': 'Elige tu plan',
-      'icon': Icons.workspace_premium,
-      'route': AppRoutes.planSelection,
+      'title': 'Comparar Servicios',
+      'subtitle': 'Compara tus opciones',
+      'icon': Icons.compare_arrows,
+      'route': AppRoutes.serviceComparison,
     },
     {
-      'title': 'Registrar Deuda',
-      'subtitle': 'Añadir nueva',
-      'icon': Icons.add,
-      'route': AppRoutes.addDebt,
+      'title': 'Alertas de Fechas',
+      'subtitle': 'Reuniones, pagos, vencimientos',
+      'icon': Icons.calendar_today,
+      'route': AppRoutes.alerts,
     },
     {
-      'title': 'Historial de Pagos',
-      'subtitle': 'Tus registros',
-      'icon': Icons.history,
-      'route': AppRoutes.paymentHistory,
+      'title': 'Calificar Servicio',
+      'subtitle': 'Evalúa tu asesoría',
+      'icon': Icons.star_rate,
+      'route': AppRoutes.serviceRating,
+    },
+    {
+      'title': 'Cancelar Contrato',
+      'subtitle': 'Cancela si no cumple',
+      'icon': Icons.cancel_presentation,
+      'route': AppRoutes.cancelContract,
+    },
+    {
+      'title': 'Simulador de Pagos',
+      'subtitle': 'Cuotas y préstamos',
+      'icon': Icons.calculate,
+      'route': AppRoutes.paymentSimulator,
+    },
+    {
+      'title': 'Ingresos y Gastos',
+      'subtitle': 'Control financiero',
+      'icon': Icons.bar_chart,
+      'route': AppRoutes.incomeExpense,
+    },
+    {
+      'title': 'Presupuesto',
+      'subtitle': 'Planifica tus finanzas',
+      'icon': Icons.account_balance_wallet,
+      'route': AppRoutes.budgetPlanning,
     },
   ];
 
@@ -72,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     _loadUserName();
     _loadNotificationStatus();
+    _checkPendingNavigation();
     _controllers = List.generate(
       options.length,
           (i) => AnimationController(
@@ -81,6 +93,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         upperBound: 1.0,
       )..value = 1.0,
     );
+  }
+
+  Future<void> _checkPendingNavigation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shouldNavigate = prefs.getBool('navigateToNotifications') ?? false;
+    if (shouldNavigate) {
+      await prefs.setBool('navigateToNotifications', false);
+      Future.microtask(() {
+        Navigator.pushNamed(context, AppRoutes.notifications);
+      });
+    }
   }
 
   Future<void> _loadUserName() async {
