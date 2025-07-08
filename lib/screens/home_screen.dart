@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
+import '../services/language_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,71 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String _userName = 'Usuario';
-  late final List<AnimationController> _controllers;
-
-  final List<Map<String, dynamic>> options = [
-    {
-      'title': 'Perfil',
-      'subtitle': 'Tus datos',
-      'icon': Icons.person,
-      'route': AppRoutes.profile,
-    },
-    {
-      'title': 'Reseñas',
-      'subtitle': 'Opiniones de usuarios',
-      'icon': Icons.reviews,
-      'route': AppRoutes.reviews,
-    },
-    {
-      'title': 'Buscar Consultores',
-      'subtitle': 'Filtra por rubro',
-      'icon': Icons.search,
-      'route': AppRoutes.consultantSearch,
-    },
-    {
-      'title': 'Comparar Servicios',
-      'subtitle': 'Compara tus opciones',
-      'icon': Icons.compare_arrows,
-      'route': AppRoutes.serviceComparison,
-    },
-    {
-      'title': 'Alertas de Fechas',
-      'subtitle': 'Reuniones, pagos, vencimientos',
-      'icon': Icons.calendar_today,
-      'route': AppRoutes.alerts,
-    },
-    {
-      'title': 'Calificar Servicio',
-      'subtitle': 'Evalúa tu asesoría',
-      'icon': Icons.star_rate,
-      'route': AppRoutes.serviceRating,
-    },
-    {
-      'title': 'Cancelar Contrato',
-      'subtitle': 'Cancela si no cumple',
-      'icon': Icons.cancel_presentation,
-      'route': AppRoutes.cancelContract,
-    },
-    {
-      'title': 'Simulador de Pagos',
-      'subtitle': 'Cuotas y préstamos',
-      'icon': Icons.calculate,
-      'route': AppRoutes.paymentSimulator,
-    },
-    {
-      'title': 'Ingresos y Gastos',
-      'subtitle': 'Control financiero',
-      'icon': Icons.bar_chart,
-      'route': AppRoutes.incomeExpense,
-    },
-    {
-      'title': 'Presupuesto',
-      'subtitle': 'Planifica tus finanzas',
-      'icon': Icons.account_balance_wallet,
-      'route': AppRoutes.budgetPlanning,
-    },
-  ];
-
+  List<AnimationController>? _controllers;
   bool _hasNotification = false;
 
   @override
@@ -84,15 +22,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _loadUserName();
     _loadNotificationStatus();
     _checkPendingNavigation();
-    _controllers = List.generate(
-      options.length,
-          (i) => AnimationController(
-        duration: const Duration(milliseconds: 150),
-        vsync: this,
-        lowerBound: 0.95,
-        upperBound: 1.0,
-      )..value = 1.0,
-    );
   }
 
   Future<void> _checkPendingNavigation() async {
@@ -122,17 +51,120 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    for (final controller in _controllers) {
-      controller.dispose();
+    if (_controllers != null) {
+      for (final controller in _controllers!) {
+        controller.dispose();
+      }
     }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).locale.languageCode;
+
+    final List<Map<String, dynamic>> options = [
+      {
+        'title': lang == 'en' ? 'Profile' : 'Perfil',
+        'subtitle': lang == 'en' ? 'Your info' : 'Tus datos',
+        'icon': Icons.person,
+        'route': AppRoutes.profile,
+      },
+      {
+        'title': lang == 'en' ? 'Reviews' : 'Reseñas',
+        'subtitle': lang == 'en' ? 'User feedback' : 'Opiniones de usuarios',
+        'icon': Icons.reviews,
+        'route': AppRoutes.reviews,
+      },
+      {
+        'title': lang == 'en' ? 'Find Consultants' : 'Buscar Consultores',
+        'subtitle': lang == 'en' ? 'Filter by sector' : 'Filtra por rubro',
+        'icon': Icons.search,
+        'route': AppRoutes.consultantSearch,
+      },
+      {
+        'title': lang == 'en' ? 'Compare Services' : 'Comparar Servicios',
+        'subtitle': lang == 'en' ? 'Compare your options' : 'Compara tus opciones',
+        'icon': Icons.compare_arrows,
+        'route': AppRoutes.serviceComparison,
+      },
+      {
+        'title': lang == 'en' ? 'Date Alerts' : 'Alertas de Fechas',
+        'subtitle': lang == 'en' ? 'Meetings, payments' : 'Reuniones, pagos, vencimientos',
+        'icon': Icons.calendar_today,
+        'route': AppRoutes.alerts,
+      },
+      {
+        'title': lang == 'en' ? 'Rate Service' : 'Calificar Servicio',
+        'subtitle': lang == 'en' ? 'Evaluate your advisor' : 'Evalúa tu asesoría',
+        'icon': Icons.star_rate,
+        'route': AppRoutes.serviceRating,
+      },
+      {
+        'title': lang == 'en' ? 'Cancel Contract' : 'Cancelar Contrato',
+        'subtitle': lang == 'en' ? 'Cancel if not met' : 'Cancela si no cumple',
+        'icon': Icons.cancel_presentation,
+        'route': AppRoutes.cancelContract,
+      },
+      {
+        'title': lang == 'en' ? 'Payment Simulator' : 'Simulador de Pagos',
+        'subtitle': lang == 'en' ? 'Loans and fees' : 'Cuotas y préstamos',
+        'icon': Icons.calculate,
+        'route': AppRoutes.paymentSimulator,
+      },
+      {
+        'title': lang == 'en' ? 'Income & Expenses' : 'Ingresos y Gastos',
+        'subtitle': lang == 'en' ? 'Finance control' : 'Control financiero',
+        'icon': Icons.bar_chart,
+        'route': AppRoutes.incomeExpense,
+      },
+      {
+        'title': lang == 'en' ? 'Budget' : 'Presupuesto',
+        'subtitle': lang == 'en' ? 'Plan your finances' : 'Planifica tus finanzas',
+        'icon': Icons.account_balance_wallet,
+        'route': AppRoutes.budgetPlanning,
+      },
+      {
+        'title': lang == 'en' ? 'Start Consulting' : 'Iniciar Asesoría',
+        'subtitle': lang == 'en' ? 'Get help' : 'Solicita ayuda personalizada',
+        'icon': Icons.assignment,
+        'route': AppRoutes.startCase,
+      },
+      {
+        'title': lang == 'en' ? 'Accept Case' : 'Aceptar Asesoría',
+        'subtitle': lang == 'en' ? 'Manage pending' : 'Gestiona casos pendientes',
+        'icon': Icons.how_to_reg,
+        'route': AppRoutes.acceptCase,
+      },
+      {
+        'title': lang == 'en' ? 'Consultant Services' : 'Servicios de Consultores',
+        'subtitle': lang == 'en' ? 'View and compare offers' : 'Visualiza y compara ofertas',
+        'icon': Icons.view_list,
+        'route': AppRoutes.consultantServices,
+      },
+      {
+        'title': lang == 'en' ? 'Performance Metrics' : 'Métricas de Desempeño',
+        'subtitle': lang == 'en' ? 'Review performance' : 'Revisa tu rendimiento',
+        'icon': Icons.insights,
+        'route': AppRoutes.performanceMetrics,
+      },
+    ];
+
+    if (_controllers == null) {
+      _controllers = List.generate(
+        options.length,
+            (i) => AnimationController(
+          duration: const Duration(milliseconds: 150),
+          vsync: this,
+          lowerBound: 0.95,
+          upperBound: 1.0,
+        )..value = 1.0,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bienvenido a DebtGo'),
+        title: Text(lang == 'en' ? 'Welcome to DebtGo' : 'Bienvenido a DebtGo'),
         centerTitle: true,
         actions: [
           PopupMenuButton(
@@ -144,10 +176,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (_) => false);
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (context) => [
               PopupMenuItem(
                 value: 'logout',
-                child: Text('Cerrar Sesión'),
+                child: Text(lang == 'en' ? 'Log out' : 'Cerrar sesión'),
               ),
             ],
           ),
@@ -167,14 +199,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           itemBuilder: (context, index) {
             final item = options[index];
             return ScaleTransition(
-              scale: _controllers[index],
+              scale: _controllers![index],
               child: GestureDetector(
-                onTapDown: (_) => _controllers[index].reverse(),
+                onTapDown: (_) => _controllers![index].reverse(),
                 onTapUp: (_) {
-                  _controllers[index].forward();
+                  _controllers![index].forward();
                   Navigator.pushNamed(context, item['route']);
                 },
-                onTapCancel: () => _controllers[index].forward(),
+                onTapCancel: () => _controllers![index].forward(),
                 child: Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(

@@ -11,7 +11,7 @@ class ApiService {
       List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => e as Map<String, dynamic>).toList();
     } else {
-      throw Exception('Error al obtener consultores: ${response.statusCode}');
+      throw Exception('Error fetching consultants: ${response.statusCode}');
     }
   }
 

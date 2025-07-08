@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class CancelContractScreen extends StatefulWidget {
   const CancelContractScreen({super.key});
@@ -8,59 +10,90 @@ class CancelContractScreen extends StatefulWidget {
 }
 
 class _CancelContractScreenState extends State<CancelContractScreen> {
-  String _selectedConsultant = '';
+  String? _selectedConsultant;
   final _reasonController = TextEditingController();
-
   final List<String> _activeContracts = [
     'Contrato con Carlos Ramírez',
     'Contrato con Lucía Torres',
     'Contrato con Pedro Gómez',
   ];
+  final List<String> _canceledContracts = [];
 
-  void _submitCancellation() {
-    if (_selectedConsultant.isEmpty || _reasonController.text.trim().isEmpty) {
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  void _submitCancellation(String lang) {
+    if (_selectedConsultant == null || _reasonController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debes seleccionar un contrato y escribir una razón')),
+        SnackBar(
+          content: Text(lang == 'es'
+              ? 'Selecciona un contrato y escribe una razón'
+              : 'Select a contract and provide a reason'),
+        ),
       );
       return;
     }
 
+    setState(() {
+      _canceledContracts.add(_selectedConsultant!);
+    });
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            'Has cancelado $_selectedConsultant.\nMotivo: ${_reasonController.text.trim()}'),
+          lang == 'es'
+              ? 'Cancelado: $_selectedConsultant\nMotivo: ${_reasonController.text.trim()}'
+              : 'Cancelled: $_selectedConsultant\nReason: ${_reasonController.text.trim()}',
+        ),
+        backgroundColor: Colors.redAccent,
       ),
     );
 
-    // Aquí podrías comunicar la cancelación al backend
+    _reasonController.clear();
+    _selectedConsultant = null;
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+    final List<String> availableContracts = _activeContracts
+        .where((contract) => !_canceledContracts.contains(contract))
+        .toList();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Cancelar Contrato')),
+      appBar: AppBar(
+        title: Text(lang == 'es' ? 'Cancelar Contrato' : 'Cancel Contract'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Contrato activo',
-                border: OutlineInputBorder(),
+              value: _selectedConsultant,
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Contrato activo'
+                    : 'Active contract',
+                border: const OutlineInputBorder(),
               ),
-              items: _activeContracts
+              items: availableContracts
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
-              onChanged: (value) => setState(() => _selectedConsultant = value ?? ''),
+              onChanged: (value) => setState(() => _selectedConsultant = value),
             ),
             const SizedBox(height: 24),
             TextFormField(
               controller: _reasonController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Motivo de la cancelación',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Motivo de la cancelación'
+                    : 'Reason for cancellation',
+                border: const OutlineInputBorder(),
               ),
             ),
             const Spacer(),
@@ -68,8 +101,40 @@ class _CancelContractScreenState extends State<CancelContractScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.cancel),
-                label: const Text('Cancelar contrato'),
-                onPressed: _submitCancellation,
+                label: Text(
+                  lang == 'es' ? 'Cancelar contrato' : 'Cancel contract',
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(lang == 'es'
+                          ? '¿Confirmar cancelación?'
+                          : 'Confirm cancellation?'),
+                      content: Text(lang == 'es'
+                          ? '¿Deseas cancelar el contrato con $_selectedConsultant?'
+                          : 'Do you want to cancel the contract with $_selectedConsultant?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(lang == 'es' ? 'No' : 'No'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _submitCancellation(lang);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                          ),
+                          child: Text(lang == 'es'
+                              ? 'Sí, cancelar'
+                              : 'Yes, cancel'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],

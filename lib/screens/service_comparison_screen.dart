@@ -1,42 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class ServiceComparisonScreen extends StatelessWidget {
   const ServiceComparisonScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+
     final List<Map<String, dynamic>> services = [
       {
-        'name': 'Asesoría Básica',
+        'name': lang == 'es' ? 'Asesoría Básica' : 'Basic Advisory',
         'price': 50.0,
-        'duration': '30 min',
+        'duration': lang == 'es' ? '30 min' : '30 min',
         'includesChat': true,
       },
       {
-        'name': 'Plan Avanzado',
+        'name': lang == 'es' ? 'Plan Avanzado' : 'Advanced Plan',
         'price': 90.0,
-        'duration': '1 hora',
+        'duration': lang == 'es' ? '1 hora' : '1 hour',
         'includesChat': true,
       },
       {
-        'name': 'Consulta Exprés',
+        'name': lang == 'es' ? 'Consulta Exprés' : 'Express Consultation',
         'price': 30.0,
-        'duration': '20 min',
+        'duration': lang == 'es' ? '20 min' : '20 min',
         'includesChat': false,
       },
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Comparar Servicios')),
+      appBar: AppBar(
+        title: Text(lang == 'es' ? 'Comparar Servicios' : 'Compare Services'),
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.all(16),
         child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Servicio')),
-            DataColumn(label: Text('Precio')),
-            DataColumn(label: Text('Duración')),
-            DataColumn(label: Text('Incluye chat')),
+          columns: [
+            DataColumn(label: Text(lang == 'es' ? 'Servicio' : 'Service')),
+            DataColumn(label: Text(lang == 'es' ? 'Precio' : 'Price')),
+            DataColumn(label: Text(lang == 'es' ? 'Duración' : 'Duration')),
+            DataColumn(label: Text(lang == 'es' ? 'Incluye chat' : 'Includes Chat')),
           ],
           rows: services.map((service) {
             return DataRow(cells: [

@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
+import '../services/language_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscure = true;
   bool _isLoading = false;
 
+  Future<void> _setLanguage(String lang) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', lang);
+    Provider.of<LanguageService>(context, listen: false).changeLanguage(lang);
+  }
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -26,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final prefs = await SharedPreferences.getInstance();
     final email = _emailController.text.trim();
 
-    // Simulación de nombre basado en correo
     String name = prefs.getString('name') ?? '';
     if (name.isEmpty) {
       if (email.toLowerCase().contains('daniel')) {
@@ -39,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('name', name);
     }
 
-    // Genera número solo si no existe
     String? phone = prefs.getString('phone');
     if (phone == null) {
       phone = '+51 9${1000000 + Random().nextInt(8999999)}';
@@ -56,23 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Campo obligatorio';
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!regex.hasMatch(value.trim())) return 'Correo no válido';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Campo obligatorio';
-    if (value.trim().length < 8) return 'Mínimo 8 caracteres';
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).locale.languageCode;
     return Scaffold(
-      appBar: AppBar(title: const Text('Iniciar sesión')),
+      appBar: AppBar(title: Text(lang == 'en' ? 'Sign in' : 'Iniciar sesión')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -80,34 +74,34 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             children: [
               const Icon(Icons.lock_outline, size: 80, color: Colors.indigo),
-              const SizedBox(height: 32),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: lang == 'en' ? 'Email' : 'Correo electrónico',
+                  prefixIcon: const Icon(Icons.email),
+                  border: const OutlineInputBorder(),
                 ),
-                validator: _validateEmail,
-                autofillHints: const [AutofillHints.email],
+                validator: (value) => (value == null || value.isEmpty)
+                    ? (lang == 'en' ? 'Required' : 'Campo obligatorio')
+                    : null,
               ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _passController,
                 obscureText: _obscure,
                 decoration: InputDecoration(
-                  labelText: 'Contraseña',
+                  labelText: lang == 'en' ? 'Password' : 'Contraseña',
                   prefixIcon: const Icon(Icons.lock),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
                     onPressed: () => setState(() => _obscure = !_obscure),
-                    tooltip: _obscure ? 'Mostrar contraseña' : 'Ocultar contraseña',
                   ),
                 ),
-                validator: _validatePassword,
-                autofillHints: const [AutofillHints.password],
+                validator: (value) => (value == null || value.length < 8)
+                    ? (lang == 'en' ? 'At least 8 characters' : 'Mínimo 8 caracteres')
+                    : null,
               ),
               const SizedBox(height: 32),
               SizedBox(
@@ -120,12 +114,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 22,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                      : const Text('Ingresar'),
+                      : Text(lang == 'en' ? 'Sign in' : 'Ingresar'),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
-                child: const Text('¿No tienes cuenta? Regístrate aquí'),
+                child: Text(lang == 'en'
+                    ? "Don't have an account? Register here"
+                    : '¿No tienes cuenta? Regístrate aquí'),
               ),
             ],
           ),
@@ -135,7 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// Extensión para capitalizar nombres automáticamente
 extension StringCasingExtension on String {
   String capitalize() {
     if (isEmpty) return this;

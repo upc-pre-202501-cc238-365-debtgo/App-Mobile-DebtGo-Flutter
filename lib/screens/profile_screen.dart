@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
+import '../services/language_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,8 +13,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String _email = 'usuario@correo.com';
-  String _phone = '+51 987 654 321';
+  String _email = '';
+  String _phone = '';
+  String _name = 'Nombre de usuario';
 
   @override
   void initState() {
@@ -22,11 +25,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-
     final email = prefs.getString('email') ?? 'usuario@correo.com';
+    final name = prefs.getString('name') ?? 'Nombre de usuario';
     var phone = prefs.getString('phone');
 
-    // Si no hay un teléfono guardado, genera uno aleatorio
     if (phone == null) {
       final random = Random();
       phone = '+51 9${1000000 + random.nextInt(8999999)}';
@@ -35,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     setState(() {
       _email = email;
+      _name = name;
       _phone = phone!;
     });
   }
@@ -47,40 +50,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).locale.languageCode;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Perfil')),
+      appBar: AppBar(title: Text(lang == 'en' ? 'My Profile' : 'Mi Perfil')),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
           const Center(
             child: CircleAvatar(
-              radius: 45,
-              child: Icon(Icons.person, size: 45),
+              radius: 50,
+              backgroundColor: Colors.indigo,
+              child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
           ),
           const SizedBox(height: 16),
-          const Divider(),
+          Center(child: Text(_name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+          const Divider(height: 40),
           ListTile(
             leading: const Icon(Icons.email),
-            title: const Text('Correo electrónico'),
+            title: Text(lang == 'en' ? 'Email' : 'Correo electrónico'),
             subtitle: Text(_email),
           ),
           ListTile(
             leading: const Icon(Icons.phone),
-            title: const Text('Teléfono'),
+            title: Text(lang == 'en' ? 'Phone' : 'Teléfono'),
             subtitle: Text(_phone),
           ),
-          const ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Configuración'),
-            subtitle: Text('Notificaciones, privacidad, idioma'),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: Text(lang == 'en' ? 'Settings' : 'Configuración'),
+            subtitle: Text(lang == 'en' ? 'Notifications, privacy, language' : 'Notificaciones, privacidad, idioma'),
+            onTap: () {
+              // futura funcionalidad
+            },
           ),
-          const Divider(),
-          const SizedBox(height: 16),
+          const Divider(height: 40),
           ElevatedButton.icon(
             onPressed: () => _logout(context),
             icon: const Icon(Icons.logout),
-            label: const Text('Cerrar sesión'),
+            label: Text(lang == 'en' ? 'Log out' : 'Cerrar sesión'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
@@ -91,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           OutlinedButton.icon(
             onPressed: () => Navigator.pushNamed(context, AppRoutes.editableProfile),
             icon: const Icon(Icons.edit),
-            label: const Text('Editar perfil'),
+            label: Text(lang == 'en' ? 'Edit profile' : 'Editar perfil'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
               foregroundColor: Colors.indigo,

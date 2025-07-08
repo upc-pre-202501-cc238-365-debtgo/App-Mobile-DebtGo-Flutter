@@ -1,16 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../routes/app_routes.dart';
+import '../services/language_service.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
+  void _showLanguageDialog(BuildContext context) {
+    final langService = Provider.of<LanguageService>(context, listen: false);
+    final currentLang = langService.locale.languageCode;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Selecciona el idioma'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<String>(
+              title: const Text('Español'),
+              value: 'es',
+              groupValue: currentLang,
+              onChanged: (value) {
+                langService.changeLanguage(value!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Inglés'),
+              value: 'en',
+              groupValue: currentLang,
+              onChanged: (value) {
+                langService.changeLanguage(value!);
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).locale.languageCode;
+
     return Scaffold(
       backgroundColor: Colors.indigo.shade50,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -24,19 +63,21 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Tu aliado para controlar tus deudas y alcanzar libertad financiera.',
+              Text(
+                lang == 'en'
+                    ? 'Your ally to manage debts and achieve financial freedom.'
+                    : 'Tu aliado para controlar tus deudas y alcanzar la libertad financiera.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 40),
               ElevatedButton.icon(
                 icon: const Icon(Icons.login),
-                label: const Text('Iniciar sesión'),
+                label: Text(lang == 'en' ? 'Log in' : 'Iniciar sesión'),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.indigo,
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.indigo,
                   minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.indigo),
                 ),
                 onPressed: () {
                   Navigator.pushNamed(context, AppRoutes.login);
@@ -45,7 +86,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               OutlinedButton.icon(
                 icon: const Icon(Icons.person_add_alt),
-                label: const Text('Registrarme'),
+                label: Text(lang == 'en' ? 'Register' : 'Registrarme'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   foregroundColor: Colors.indigo,
@@ -55,10 +96,54 @@ class WelcomeScreen extends StatelessWidget {
                   Navigator.pushNamed(context, AppRoutes.register);
                 },
               ),
+              const SizedBox(height: 16),
+              TextButton.icon(
+                icon: const Icon(Icons.language, color: Colors.indigo),
+                label: const Text(
+                  'Cambiar idioma',
+                  style: TextStyle(color: Colors.indigo),
+                ),
+                onPressed: () => _showLanguageDialog(context),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+void _showLanguageDialog(BuildContext context) {
+  final langService = Provider.of<LanguageService>(context, listen: false);
+  final currentLang = langService.locale.languageCode;
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Selecciona el idioma'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RadioListTile<String>(
+            title: const Text('Español'),
+            value: 'es',
+            groupValue: currentLang,
+            onChanged: (value) {
+              langService.changeLanguage(value!);
+              Navigator.pop(ctx);
+            },
+          ),
+          RadioListTile<String>(
+            title: const Text('Inglés'),
+            value: 'en',
+            groupValue: currentLang,
+            onChanged: (value) {
+              langService.changeLanguage(value!);
+              Navigator.pop(ctx);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 }

@@ -1,4 +1,6 @@
+import 'package:debtgo_flutter/screens/accept_case_screen.dart';
 import 'package:debtgo_flutter/screens/register_screen.dart';
+import 'package:debtgo_flutter/screens/start_case_screen.dart';
 import 'package:debtgo_flutter/screens/welcome_screen.dart';
 import 'package:debtgo_flutter/screens/notification_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +19,10 @@ import '../screens/service_rating_screen.dart';
 import '../screens/splash_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/profile_screen.dart';
+import 'package:debtgo_flutter/screens/consultant_services_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/reviews_screen.dart';
+import 'package:debtgo_flutter/screens/performance_metrics_screen.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
@@ -41,7 +45,11 @@ class AppRoutes {
   static const String reviews = '/reviews';
   static const String reminders = '/reminders';
   static const String editableProfile = '/editable-profile';
-  static const notifications = '/notifications';
+  static const String notifications = '/notifications';
+  static const String startCase = '/start-case';
+  static const String acceptCase = '/accept-case';
+  static const String consultantServices = '/consultant-services';
+  static const String performanceMetrics = '/performance-metrics';
 
   static Map<String, WidgetBuilder> routes = {
     welcome: (context) => const WelcomeScreen(),
@@ -63,7 +71,11 @@ class AppRoutes {
     profile: (context) => const ProfileScreen(),
     reviews: (context) => const ReviewsScreen(),
     editableProfile: (context) => const EditableProfileScreen(),
-    notifications: (_) => const NotificationListScreen()
+    notifications: (context) => const NotificationListScreen(),
+    startCase: (context) => StartCaseScreen(),
+    acceptCase: (context) => const AcceptCaseScreen(),
+    consultantServices: (context) => const ConsultantServicesScreen(),
+    performanceMetrics: (context) => const PerformanceMetricsScreen(),
   };
 }
 

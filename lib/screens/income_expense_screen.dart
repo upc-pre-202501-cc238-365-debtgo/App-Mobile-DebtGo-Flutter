@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class IncomeExpenseScreen extends StatefulWidget {
   const IncomeExpenseScreen({super.key});
@@ -22,7 +24,7 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
       .where((r) => r['type'] == 'Gasto')
       .fold(0.0, (sum, r) => sum + r['amount']);
 
-  void _addRecord() {
+  void _addRecord(String lang) {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _records.add({
@@ -32,13 +34,16 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
         });
         _amountController.clear();
         _descController.clear();
-        _type = 'Ingreso';
+        _type = lang == 'es' ? 'Ingreso' : 'Income';
       });
       Navigator.pop(context);
     }
   }
 
-  void _openAddDialog() {
+  void _openAddDialog(String lang) {
+    final incomeLabel = lang == 'es' ? 'Ingreso' : 'Income';
+    final expenseLabel = lang == 'es' ? 'Gasto' : 'Expense';
+
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
@@ -54,40 +59,44 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
             child: Wrap(
               runSpacing: 16,
               children: [
-                const Text('Nuevo Registro',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                Text(
+                  lang == 'es' ? 'Nuevo Registro' : 'New Record',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
                 DropdownButtonFormField<String>(
                   value: _type,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: lang == 'es' ? 'Tipo' : 'Type',
+                    border: const OutlineInputBorder(),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'Ingreso', child: Text('Ingreso')),
-                    DropdownMenuItem(value: 'Gasto', child: Text('Gasto')),
+                  items: [
+                    DropdownMenuItem(value: incomeLabel, child: Text(incomeLabel)),
+                    DropdownMenuItem(value: expenseLabel, child: Text(expenseLabel)),
                   ],
                   onChanged: (value) => setState(() => _type = value!),
                 ),
                 TextFormField(
                   controller: _descController,
-                  decoration: const InputDecoration(
-                    labelText: 'Descripción',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: lang == 'es' ? 'Descripción' : 'Description',
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (v) => v == null || v.trim().isEmpty
-                      ? 'Campo obligatorio'
+                      ? (lang == 'es' ? 'Campo obligatorio' : 'Required field')
                       : null,
                 ),
                 TextFormField(
                   controller: _amountController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Monto',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: lang == 'es' ? 'Monto' : 'Amount',
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (v) {
                     final n = double.tryParse(v ?? '');
-                    if (n == null || n <= 0) return 'Monto no válido';
+                    if (n == null || n <= 0) {
+                      return lang == 'es' ? 'Monto no válido' : 'Invalid amount';
+                    }
                     return null;
                   },
                 ),
@@ -95,8 +104,8 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.save),
-                    label: const Text('Guardar'),
-                    onPressed: _addRecord,
+                    label: Text(lang == 'es' ? 'Guardar' : 'Save'),
+                    onPressed: () => _addRecord(lang),
                   ),
                 ),
               ],
@@ -109,8 +118,21 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+    final incomeLabel = lang == 'es' ? 'Ingreso' : 'Income';
+    final expenseLabel = lang == 'es' ? 'Gasto' : 'Expense';
+
+    //Asegura que el valor de _type exista entre las opciones válidas
+    if (_type != incomeLabel && _type != expenseLabel) {
+      _type = incomeLabel;
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Seguimiento de Ingresos y Gastos')),
+      appBar: AppBar(
+        title: Text(lang == 'es'
+            ? 'Seguimiento de Ingresos y Gastos'
+            : 'Income and Expense Tracker'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -120,32 +142,36 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: const Icon(Icons.pie_chart, color: Colors.indigo),
-                title: const Text('Resumen Mensual'),
+                title: Text(lang == 'es' ? 'Resumen Mensual' : 'Monthly Summary'),
                 subtitle: Text(
-                  'Ingresos: S/ ${totalIncome.toStringAsFixed(2)}\nGastos: S/ ${totalExpense.toStringAsFixed(2)}',
+                  '${lang == 'es' ? 'Ingresos' : 'Income'}: S/ ${totalIncome.toStringAsFixed(2)}\n'
+                      '${lang == 'es' ? 'Gastos' : 'Expenses'}: S/ ${totalExpense.toStringAsFixed(2)}',
                 ),
               ),
             ),
             const SizedBox(height: 12),
             Expanded(
               child: _records.isEmpty
-                  ? const Center(child: Text('No hay registros aún.'))
+                  ? Center(
+                child: Text(lang == 'es'
+                    ? 'No hay registros aún.'
+                    : 'No records yet.'),
+              )
                   : ListView.builder(
                 itemCount: _records.length,
                 itemBuilder: (context, index) {
                   final r = _records[index];
-                  final color = r['type'] == 'Ingreso'
-                      ? Colors.green
-                      : Colors.redAccent;
+                  final isIncome = r['type'] == 'Ingreso' || r['type'] == 'Income';
+                  final color = isIncome ? Colors.green : Colors.redAccent;
+
                   return Card(
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
                       leading: Icon(
-                        r['type'] == 'Ingreso'
-                            ? Icons.trending_up
-                            : Icons.trending_down,
+                        isIncome ? Icons.trending_up : Icons.trending_down,
                         color: color,
                       ),
                       title: Text(r['description']),
@@ -165,7 +191,7 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddDialog,
+        onPressed: () => _openAddDialog(lang),
         child: const Icon(Icons.add),
       ),
     );

@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
+import '../services/language_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,9 +17,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
-
   bool _obscure = true;
   bool _loading = false;
+
+  Future<void> _setLanguage(String lang) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', lang);
+    Provider.of<LanguageService>(context, listen: false).changeLanguage(lang);
+  }
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -26,80 +33,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
     await Future.delayed(const Duration(seconds: 1));
 
     final prefs = await SharedPreferences.getInstance();
-
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
-
-    final randomPhone = '+51 9${1000000 + Random().nextInt(8999999)}';
+    final phone = '+51 9${1000000 + Random().nextInt(8999999)}';
 
     await prefs.setBool('is_logged', true);
     await prefs.setString('name', name);
     await prefs.setString('email', email);
-    await prefs.setString('phone', randomPhone);
+    await prefs.setString('phone', phone);
 
-    if (mounted) {
-      setState(() => _loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso')),
-      );
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
-    }
-  }
-
-  String? _validateName(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Ingrese su nombre completo';
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Ingrese su correo';
-    final regex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!regex.hasMatch(value.trim())) return 'Correo no válido';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Ingrese una contraseña';
-    if (value.trim().length < 8) return 'Debe tener al menos 8 caracteres';
-    return null;
+    if (!mounted) return;
+    setState(() => _loading = false);
+    final lang = Provider.of<LanguageService>(context, listen: false).locale.languageCode;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(lang == 'en' ? 'Successful registration!' : 'Registro exitoso. ¡Bienvenido a DebtGo!')),
+    );
+    Navigator.pushReplacementNamed(context, AppRoutes.home);
   }
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).locale.languageCode;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrarse')),
+      appBar: AppBar(title: Text(lang == 'en' ? 'Create Account' : 'Crear cuenta')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              const Icon(Icons.person_add, size: 80, color: Colors.indigo),
-              const SizedBox(height: 32),
-
-              /// CAMPO DE NOMBRE COMPLETO
+              const Icon(Icons.person_add_alt_1, size: 80, color: Colors.indigo),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre completo',
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: lang == 'en' ? 'Full Name' : 'Nombre completo',
+                  prefixIcon: const Icon(Icons.person),
+                  border: const OutlineInputBorder(),
                 ),
-                validator: _validateName,
-                autofillHints: const [AutofillHints.name],
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? (lang == 'en' ? 'Enter your full name' : 'Ingrese su nombre completo')
+                    : null,
               ),
               const SizedBox(height: 20),
 
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: lang == 'en' ? 'Email' : 'Correo electrónico',
+                  prefixIcon: const Icon(Icons.email),
+                  border: const OutlineInputBorder(),
                 ),
-                validator: _validateEmail,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return lang == 'en' ? 'Enter your email' : 'Ingrese su correo';
+                  }
+                  final regex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  return regex.hasMatch(value.trim())
+                      ? null
+                      : (lang == 'en' ? 'Invalid email' : 'Correo no válido');
+                },
                 keyboardType: TextInputType.emailAddress,
-                autofillHints: const [AutofillHints.email],
               ),
               const SizedBox(height: 20),
 
@@ -107,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _passController,
                 obscureText: _obscure,
                 decoration: InputDecoration(
-                  labelText: 'Contraseña',
+                  labelText: lang == 'en' ? 'Password' : 'Contraseña',
                   prefixIcon: const Icon(Icons.lock),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -115,8 +110,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
-                validator: _validatePassword,
-                autofillHints: const [AutofillHints.newPassword],
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return lang == 'en' ? 'Enter a password' : 'Ingrese una contraseña';
+                  }
+                  return value.trim().length < 8
+                      ? (lang == 'en'
+                      ? 'Must be at least 8 characters'
+                      : 'Debe tener al menos 8 caracteres')
+                      : null;
+                },
               ),
               const SizedBox(height: 32),
 
@@ -131,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                       : const Icon(Icons.check),
-                  label: const Text('Registrarme'),
+                  label: Text(lang == 'en' ? 'Register' : 'Registrarme'),
                 ),
               ),
             ],

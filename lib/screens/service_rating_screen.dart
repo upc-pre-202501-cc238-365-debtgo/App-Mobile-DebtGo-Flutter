@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class ServiceRatingScreen extends StatefulWidget {
   const ServiceRatingScreen({super.key});
@@ -18,17 +20,22 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
     'Pedro Gómez',
   ];
 
-  void _submitRating() {
+  void _submitRating(String lang) {
     if (_selectedConsultant == null || _rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona consultor y calificación')),
+        SnackBar(
+          content: Text(lang == 'es'
+              ? 'Selecciona consultor y calificación'
+              : 'Select consultant and rating'),
+        ),
       );
       return;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-          'Has calificado a $_selectedConsultant con $_rating estrellas.\nComentario: ${_commentController.text.trim()}'),
+      content: Text(lang == 'es'
+          ? 'Has calificado a $_selectedConsultant con $_rating estrellas.\nComentario: ${_commentController.text.trim()}'
+          : 'You rated $_selectedConsultant with $_rating stars.\nComment: ${_commentController.text.trim()}'),
     ));
 
     setState(() {
@@ -44,8 +51,10 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
       children: List.generate(5, (i) {
         final filled = i < _rating;
         return IconButton(
-          icon: Icon(filled ? Icons.star : Icons.star_border,
-              color: filled ? Colors.amber : Colors.grey),
+          icon: Icon(
+            filled ? Icons.star : Icons.star_border,
+            color: filled ? Colors.amber : Colors.grey,
+          ),
           onPressed: () => setState(() => _rating = i + 1),
         );
       }),
@@ -54,34 +63,40 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Calificar Servicio')),
+      appBar: AppBar(
+        title: Text(lang == 'es' ? 'Calificar Servicio' : 'Rate Service'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             DropdownButtonFormField<String>(
               value: _selectedConsultant,
-              hint: const Text('Selecciona consultor'),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Consultor',
+              hint: Text(lang == 'es' ? 'Selecciona consultor' : 'Select consultant'),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: lang == 'es' ? 'Consultor' : 'Consultant',
               ),
               items: _consultants
-                  .map((c) =>
-                  DropdownMenuItem(value: c, child: Text(c)))
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
               onChanged: (value) => setState(() => _selectedConsultant = value),
             ),
             const SizedBox(height: 24),
-            const Text('Calificación', style: TextStyle(fontSize: 16)),
+            Text(
+              lang == 'es' ? 'Calificación' : 'Rating',
+              style: const TextStyle(fontSize: 16),
+            ),
             _buildStars(),
             TextField(
               controller: _commentController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Comentario (opcional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es' ? 'Comentario (opcional)' : 'Comment (optional)',
+                border: const OutlineInputBorder(),
               ),
             ),
             const Spacer(),
@@ -89,8 +104,8 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.send),
-                label: const Text('Enviar Calificación'),
-                onPressed: _submitRating,
+                label: Text(lang == 'es' ? 'Enviar Calificación' : 'Submit Rating'),
+                onPressed: () => _submitRating(lang),
               ),
             )
           ],

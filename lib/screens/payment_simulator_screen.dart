@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math';
+import '../services/language_service.dart';
 
 class PaymentSimulatorScreen extends StatefulWidget {
   const PaymentSimulatorScreen({super.key});
@@ -20,8 +22,13 @@ class _PaymentSimulatorScreenState extends State<PaymentSimulatorScreen> {
     final int? months = int.tryParse(_monthsController.text.trim());
 
     if (principal == null || annualRate == null || months == null || months <= 0) {
+      final lang = Provider.of<LanguageService>(context, listen: false).language;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa valores válidos')),
+        SnackBar(
+          content: Text(lang == 'es'
+              ? 'Por favor ingresa valores válidos'
+              : 'Please enter valid values'),
+        ),
       );
       return;
     }
@@ -42,8 +49,12 @@ class _PaymentSimulatorScreenState extends State<PaymentSimulatorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Simulador de Pagos')),
+      appBar: AppBar(
+        title: Text(lang == 'es' ? 'Simulador de Pagos' : 'Payment Simulator'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -51,27 +62,33 @@ class _PaymentSimulatorScreenState extends State<PaymentSimulatorScreen> {
             TextField(
               controller: _amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Monto del préstamo (S/)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Monto del préstamo (S/)'
+                    : 'Loan amount (S/)',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _interestController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Tasa de interés anual (%)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Tasa de interés anual (%)'
+                    : 'Annual interest rate (%)',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _monthsController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Cantidad de meses',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Cantidad de meses'
+                    : 'Number of months',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 32),
@@ -80,13 +97,17 @@ class _PaymentSimulatorScreenState extends State<PaymentSimulatorScreen> {
               child: ElevatedButton.icon(
                 onPressed: _simulatePayment,
                 icon: const Icon(Icons.calculate),
-                label: const Text('Calcular pago mensual'),
+                label: Text(lang == 'es'
+                    ? 'Calcular pago mensual'
+                    : 'Calculate monthly payment'),
               ),
             ),
             const SizedBox(height: 24),
             if (_monthlyPayment != null)
               Text(
-                'Pago mensual estimado: S/ ${_monthlyPayment!.toStringAsFixed(2)}',
+                lang == 'es'
+                    ? 'Pago mensual estimado: S/ ${_monthlyPayment!.toStringAsFixed(2)}'
+                    : 'Estimated monthly payment: S/ ${_monthlyPayment!.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

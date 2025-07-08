@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class ConsultantSearchScreen extends StatefulWidget {
   const ConsultantSearchScreen({super.key});
@@ -9,14 +11,38 @@ class ConsultantSearchScreen extends StatefulWidget {
 
 class _ConsultantSearchScreenState extends State<ConsultantSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final List<Map<String, String>> _consultants = [
-    {'name': 'Carlos Ramírez', 'expertise': 'Finanzas para pequeños negocios'},
-    {'name': 'Lucía Torres', 'expertise': 'Microcréditos y préstamos'},
-    {'name': 'Pedro Gómez', 'expertise': 'Planificación financiera'},
-    {'name': 'María Soto', 'expertise': 'Gestión de deudas'},
+  final List<Map<String, Map<String, String>>> _consultants = [
+    {
+      'name': {'es': 'Carlos Ramírez', 'en': 'Carlos Ramírez'},
+      'expertise': {
+        'es': 'Finanzas para pequeños negocios',
+        'en': 'Finance for small businesses'
+      },
+    },
+    {
+      'name': {'es': 'Lucía Torres', 'en': 'Lucía Torres'},
+      'expertise': {
+        'es': 'Microcréditos y préstamos',
+        'en': 'Microcredits and loans'
+      },
+    },
+    {
+      'name': {'es': 'Pedro Gómez', 'en': 'Pedro Gómez'},
+      'expertise': {
+        'es': 'Planificación financiera',
+        'en': 'Financial planning'
+      },
+    },
+    {
+      'name': {'es': 'María Soto', 'en': 'María Soto'},
+      'expertise': {
+        'es': 'Gestión de deudas',
+        'en': 'Debt management'
+      },
+    },
   ];
 
-  List<Map<String, String>> _filteredConsultants = [];
+  List<Map<String, Map<String, String>>> _filteredConsultants = [];
 
   @override
   void initState() {
@@ -24,37 +50,49 @@ class _ConsultantSearchScreenState extends State<ConsultantSearchScreen> {
     _filteredConsultants = List.from(_consultants);
   }
 
-  void _filterConsultants(String query) {
+  void _filterConsultants(String query, String lang) {
     setState(() {
       _filteredConsultants = _consultants
           .where((c) =>
-      c['name']!.toLowerCase().contains(query.toLowerCase()) ||
-          c['expertise']!.toLowerCase().contains(query.toLowerCase()))
+      c['name']![lang]!.toLowerCase().contains(query.toLowerCase()) ||
+          c['expertise']![lang]!
+              .toLowerCase()
+              .contains(query.toLowerCase()))
           .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Buscar Consultores')),
+      appBar: AppBar(
+        title: Text(lang == 'es' ? 'Buscar Consultores' : 'Search Consultants'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _searchController,
-              onChanged: _filterConsultants,
-              decoration: const InputDecoration(
-                labelText: 'Buscar por nombre o especialidad',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
+              onChanged: (value) => _filterConsultants(value, lang),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Buscar por nombre o especialidad'
+                    : 'Search by name or expertise',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.search),
               ),
             ),
             const SizedBox(height: 20),
             Expanded(
               child: _filteredConsultants.isEmpty
-                  ? const Center(child: Text('No se encontraron consultores.'))
+                  ? Center(
+                child: Text(lang == 'es'
+                    ? 'No se encontraron consultores.'
+                    : 'No consultants found.'),
+              )
                   : ListView.builder(
                 itemCount: _filteredConsultants.length,
                 itemBuilder: (context, index) {
@@ -62,8 +100,8 @@ class _ConsultantSearchScreenState extends State<ConsultantSearchScreen> {
                   return Card(
                     child: ListTile(
                       leading: const Icon(Icons.person),
-                      title: Text(consultant['name']!),
-                      subtitle: Text(consultant['expertise']!),
+                      title: Text(consultant['name']![lang]!),
+                      subtitle: Text(consultant['expertise']![lang]!),
                     ),
                   );
                 },

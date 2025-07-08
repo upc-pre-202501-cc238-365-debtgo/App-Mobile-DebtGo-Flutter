@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/language_service.dart';
 
 class RateServiceScreen extends StatefulWidget {
   const RateServiceScreen({super.key});
@@ -17,10 +19,15 @@ class _RateServiceScreenState extends State<RateServiceScreen> {
     'Pedro Gómez',
   ];
 
-  void _submitRating() {
+  void _submitRating(String lang) {
     if (_rating == 0 || _selectedConsultant.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona consultor y calificación')),
+        SnackBar(
+          content: Text(
+              lang == 'es'
+                  ? 'Selecciona consultor y calificación'
+                  : 'Select consultant and rating'),
+        ),
       );
       return;
     }
@@ -29,11 +36,13 @@ class _RateServiceScreenState extends State<RateServiceScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            'Has calificado a $_selectedConsultant con $_rating ⭐\nComentario: ${comment.isEmpty ? "Ninguno" : comment}'),
+          lang == 'es'
+              ? 'Has calificado a $_selectedConsultant con $_rating ⭐\nComentario: ${comment.isEmpty ? "Ninguno" : comment}'
+              : 'You rated $_selectedConsultant with $_rating ⭐\nComment: ${comment.isEmpty ? "None" : comment}',
+        ),
       ),
     );
 
-    // Aquí podrías enviar los datos a tu backend
     Navigator.pop(context);
   }
 
@@ -55,32 +64,44 @@ class _RateServiceScreenState extends State<RateServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageService>(context).language;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Calificar Servicio')),
+      appBar: AppBar(
+        title: Text(lang == 'es' ? 'Calificar Servicio' : 'Rate Service'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Consultor a calificar',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Consultor a calificar'
+                    : 'Consultant to rate',
+                border: const OutlineInputBorder(),
               ),
               items: _consultants
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
-              onChanged: (value) => setState(() => _selectedConsultant = value ?? ''),
+              onChanged: (value) =>
+                  setState(() => _selectedConsultant = value ?? ''),
             ),
             const SizedBox(height: 24),
-            const Text('Calificación:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              lang == 'es' ? 'Calificación:' : 'Rating:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             _buildStars(),
             const SizedBox(height: 16),
             TextField(
               controller: _commentController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Comentario (opcional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: lang == 'es'
+                    ? 'Comentario (opcional)'
+                    : 'Comment (optional)',
+                border: const OutlineInputBorder(),
               ),
             ),
             const Spacer(),
@@ -88,8 +109,10 @@ class _RateServiceScreenState extends State<RateServiceScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.send),
-                label: const Text('Enviar calificación'),
-                onPressed: _submitRating,
+                label: Text(lang == 'es'
+                    ? 'Enviar calificación'
+                    : 'Submit rating'),
+                onPressed: () => _submitRating(lang),
               ),
             ),
           ],

@@ -3,8 +3,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../main.dart';
 import '../routes/app_routes.dart';
+import '../services/language_service.dart';
 
 class NotificationService {
   static final _notifications = FlutterLocalNotificationsPlugin();
@@ -17,7 +20,7 @@ class NotificationService {
 
     final status = await Permission.notification.request();
     if (!status.isGranted) {
-      print("Permiso de notificaciones no concedido");
+      print("❌ Notification permission not granted");
       return;
     }
 
@@ -36,7 +39,6 @@ class NotificationService {
 
   @pragma('vm:entry-point')
   static void notificationTapBackground(NotificationResponse response) {
-    // No navegar aquí: solo útil si quieres guardar algo en SharedPreferences, por ejemplo
     print("🕗 [Background] TAP en notificación con payload: ${response.payload}");
   }
 
@@ -71,4 +73,3 @@ class NotificationService {
     );
   }
 }
-
