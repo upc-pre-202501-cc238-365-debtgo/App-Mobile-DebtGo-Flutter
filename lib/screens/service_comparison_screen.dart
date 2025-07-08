@@ -23,7 +23,7 @@ class ServiceComparisonScreen extends StatelessWidget {
         'includesChat': true,
       },
       {
-        'name': lang == 'es' ? 'Consulta Exprés' : 'Express Consultation',
+        'name': lang == 'es' ? 'Emprendedor Exprés' : 'Express Entrepreneur',
         'price': 30.0,
         'duration': lang == 'es' ? '20 min' : '20 min',
         'includesChat': false,

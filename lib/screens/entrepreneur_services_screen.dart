@@ -4,30 +4,30 @@ import '../services/language_service.dart';
 
 class Service {
   final String id;
-  final String consultantName;
+  final String entrepreneurName;
   final Map<String, String> description;
   final double price;
 
   Service({
     required this.id,
-    required this.consultantName,
+    required this.entrepreneurName,
     required this.description,
     required this.price,
   });
 }
 
-class ConsultantServicesScreen extends StatefulWidget {
-  const ConsultantServicesScreen({super.key});
+class EntrepreneurServicesScreen extends StatefulWidget {
+  const EntrepreneurServicesScreen({super.key});
 
   @override
-  State<ConsultantServicesScreen> createState() => _ConsultantServicesScreenState();
+  State<EntrepreneurServicesScreen> createState() => _EntrepreneurServicesScreenState();
 }
 
-class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
+class _EntrepreneurServicesScreenState extends State<EntrepreneurServicesScreen> {
   final List<Service> services = [
     Service(
       id: '1',
-      consultantName: 'Ana Morales',
+      entrepreneurName: 'Ana Morales',
       description: {
         'es': 'Asesoramiento financiero y estrategia de ahorro',
         'en': 'Financial advice and saving strategy',
@@ -36,7 +36,7 @@ class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
     ),
     Service(
       id: '2',
-      consultantName: 'Carlos Ruiz',
+      entrepreneurName: 'Carlos Ruiz',
       description: {
         'es': 'Planificación de inversiones para emprendedores.',
         'en': 'Investment planning for entrepreneurs.',
@@ -53,7 +53,7 @@ class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(lang == 'es' ? '¿Confirmar contratación?' : 'Confirm Contract?'),
         content: Text(
-          '${lang == 'es' ? '¿Deseas contratar el servicio de' : 'Do you want to hire the service of'} ${service.consultantName} ${lang == 'es' ? 'por S/' : 'for \$'}${service.price.toStringAsFixed(2)}?\n\n${lang == 'es' ? 'Descripción' : 'Description'}:\n${service.description[lang]!}',
+          '${lang == 'es' ? '¿Deseas contratar el servicio de' : 'Do you want to hire the service of'} ${service.entrepreneurName} ${lang == 'es' ? 'por S/' : 'for \$'}${service.price.toStringAsFixed(2)}?\n\n${lang == 'es' ? 'Descripción' : 'Description'}:\n${service.description[lang]!}',
         ),
         actions: [
           TextButton(
@@ -62,9 +62,7 @@ class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
           ),
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.of(ctx).pop(); // cerrar diálogo
-
-              // Mostrar animación de procesamiento
+              Navigator.of(ctx).pop();
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -84,18 +82,18 @@ class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
               );
 
               Future.delayed(const Duration(seconds: 2), () {
-                Navigator.of(context).pop(); // cerrar animación
+                Navigator.of(context).pop();
 
                 setState(() {
-                  contractedServiceIds.add(service.id); // guardar ID contratado
+                  contractedServiceIds.add(service.id);
                 });
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
                       lang == 'es'
-                          ? 'Has contratado a ${service.consultantName} exitosamente.'
-                          : 'You have successfully hired ${service.consultantName}.',
+                          ? 'Has contratado a ${service.entrepreneurName} exitosamente.'
+                          : 'You have successfully hired ${service.entrepreneurName}.',
                     ),
                     backgroundColor: Colors.green,
                   ),
@@ -116,7 +114,7 @@ class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lang == 'es' ? 'Otros servicios de consultoría' : 'Other Consulting Services'),
+        title: Text(lang == 'es' ? 'Otros servicios de emprendedores' : 'Other entrepreneur Services'),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -142,7 +140,7 @@ class _ConsultantServicesScreenState extends State<ConsultantServicesScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(service.consultantName,
+                        Text(service.entrepreneurName,
                             style: const TextStyle(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 4),
                         Text(service.description[lang]!),

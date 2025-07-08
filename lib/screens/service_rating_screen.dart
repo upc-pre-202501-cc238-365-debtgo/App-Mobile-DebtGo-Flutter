@@ -15,9 +15,9 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
   final _commentController = TextEditingController();
 
   final List<String> _consultants = [
-    'Lucía Torres',
-    'Carlos Ramírez',
-    'Pedro Gómez',
+    'Alfonso Cáceres',
+    'Miguel Fuentes',
+    'Sofia Mendoza',
   ];
 
   void _submitRating(String lang) {
@@ -25,8 +25,8 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(lang == 'es'
-              ? 'Selecciona consultor y calificación'
-              : 'Select consultant and rating'),
+              ? 'Selecciona asesor y calificación'
+              : 'Select advisor and rating'),
         ),
       );
       return;
@@ -75,10 +75,10 @@ class _ServiceRatingScreenState extends State<ServiceRatingScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: _selectedConsultant,
-              hint: Text(lang == 'es' ? 'Selecciona consultor' : 'Select consultant'),
+              hint: Text(lang == 'es' ? 'Selecciona asesor' : 'Select advisor'),
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                labelText: lang == 'es' ? 'Consultor' : 'Consultant',
+                labelText: lang == 'es' ? 'Asesor' : 'Advisor',
               ),
               items: _consultants
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))

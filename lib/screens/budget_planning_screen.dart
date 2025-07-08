@@ -33,7 +33,7 @@ class _BudgetPlanningScreenState extends State<BudgetPlanningScreen> {
     }
 
     final remaining = income - expenses;
-    final suggested = (income * 0.20).clamp(0, remaining); // Ahorro sugerido: 20%
+    final suggested = (income * 0.20).clamp(0, remaining);
 
     setState(() {
       _balance = remaining - goal;

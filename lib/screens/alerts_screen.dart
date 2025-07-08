@@ -12,8 +12,8 @@ class AlertsScreen extends StatelessWidget {
     final alerts = [
       {
         'title': {
-          'es': 'Reunión con Consultor',
-          'en': 'Meeting with Consultant',
+          'es': 'Reunión con Emprendedor',
+          'en': 'Meeting with Entrepreneur',
         },
         'date': '2025-07-05',
         'description': {

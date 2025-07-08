@@ -12,8 +12,8 @@ class ImportantAlertsScreen extends StatelessWidget {
     final List<Map<String, Map<String, String>>> alerts = [
       {
         'title': {
-          'es': 'Reunión con consultor',
-          'en': 'Meeting with consultant',
+          'es': 'Reunión con emprendedor',
+          'en': 'Meeting with entrepreneur',
         },
         'date': {
           'es': '28 jun 2025',

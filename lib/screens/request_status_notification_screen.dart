@@ -16,8 +16,8 @@ class RequestStatusNotificationScreen extends StatelessWidget {
           'en': 'Request Accepted',
         },
         'description': {
-          'es': 'Tu solicitud fue aceptada por el consultor Carlos Ramírez.',
-          'en': 'Your request was accepted by consultant Carlos Ramírez.',
+          'es': 'Tu solicitud fue aceptada por el emprendedor Carlos Ramírez.',
+          'en': 'Your request was accepted by entrepreneur Carlos Ramírez.',
         },
         'timestamp': {
           'es': '27 jun 2025 • 14:35',
@@ -30,8 +30,8 @@ class RequestStatusNotificationScreen extends StatelessWidget {
           'en': 'Request Under Review',
         },
         'description': {
-          'es': 'El consultor Lucía Torres está revisando tu solicitud.',
-          'en': 'Consultant Lucía Torres is reviewing your request.',
+          'es': 'La emprendedora Lucía Torres está revisando tu solicitud.',
+          'en': 'Entrepreneur Lucía Torres is reviewing your request.',
         },
         'timestamp': {
           'es': '26 jun 2025 • 10:22',
@@ -44,8 +44,8 @@ class RequestStatusNotificationScreen extends StatelessWidget {
           'en': 'Request Rejected',
         },
         'description': {
-          'es': 'Pedro Gómez ha rechazado tu solicitud. Puedes buscar otro consultor.',
-          'en': 'Pedro Gómez has rejected your request. You may look for another consultant.',
+          'es': 'Pedro Gómez ha rechazado tu solicitud. Puedes buscar otro emprendedor.',
+          'en': 'Pedro Gómez has rejected your request. You may look for another entrepreneur.',
         },
         'timestamp': {
           'es': '25 jun 2025 • 17:48',

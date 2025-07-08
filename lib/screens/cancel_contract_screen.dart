@@ -13,9 +13,9 @@ class _CancelContractScreenState extends State<CancelContractScreen> {
   String? _selectedConsultant;
   final _reasonController = TextEditingController();
   final List<String> _activeContracts = [
-    'Contrato con Carlos Ramírez',
-    'Contrato con Lucía Torres',
-    'Contrato con Pedro Gómez',
+    'Contrato con Alfonso Cáceres',
+    'Contrato con Miguel Fuentes',
+    'Contrato con Sofia Mendoza',
   ];
   final List<String> _canceledContracts = [];
 

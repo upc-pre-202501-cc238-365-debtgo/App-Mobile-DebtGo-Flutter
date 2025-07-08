@@ -25,8 +25,8 @@ class _RateServiceScreenState extends State<RateServiceScreen> {
         SnackBar(
           content: Text(
               lang == 'es'
-                  ? 'Selecciona consultor y calificación'
-                  : 'Select consultant and rating'),
+                  ? 'Selecciona asesor y calificación'
+                  : 'Select advisor and rating'),
         ),
       );
       return;

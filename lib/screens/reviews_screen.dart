@@ -250,9 +250,16 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showRequestDialog(context),
-        icon: const Icon(Icons.person_add_alt_1),
-        label: Text(lang == 'es' ? 'Solicitar reseña' : 'Request Review'),
-        backgroundColor: Colors.indigo,
+        icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
+        label: Text(
+          lang == 'es' ? 'Solicitar Reseña' : 'Request Review',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        backgroundColor: Colors.indigo.shade700,
       ),
     );
   }

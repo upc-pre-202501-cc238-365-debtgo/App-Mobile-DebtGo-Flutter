@@ -1,13 +1,14 @@
-import 'package:debtgo_flutter/screens/accept_case_screen.dart';
+import 'package:debtgo_flutter/screens/accept_request_screen.dart';
+import 'package:debtgo_flutter/screens/advice_request_list_screen.dart';
 import 'package:debtgo_flutter/screens/register_screen.dart';
-import 'package:debtgo_flutter/screens/start_case_screen.dart';
+import 'package:debtgo_flutter/screens/start_request_screen.dart';
 import 'package:debtgo_flutter/screens/welcome_screen.dart';
 import 'package:debtgo_flutter/screens/notification_list_screen.dart';
 import 'package:flutter/material.dart';
 import '../screens/alerts_screen.dart';
 import '../screens/budget_planning_screen.dart';
 import '../screens/cancel_contract_screen.dart';
-import '../screens/consultant_search_screen.dart';
+import '../screens/entrepreneur_search_screen.dart';
 import '../screens/editable_profile_screen.dart';
 import '../screens/important_alerts_screen.dart';
 import '../screens/income_expense_screen.dart';
@@ -19,7 +20,7 @@ import '../screens/service_rating_screen.dart';
 import '../screens/splash_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/profile_screen.dart';
-import 'package:debtgo_flutter/screens/consultant_services_screen.dart';
+import 'package:debtgo_flutter/screens/entrepreneur_services_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/reviews_screen.dart';
 import 'package:debtgo_flutter/screens/performance_metrics_screen.dart';
@@ -30,7 +31,7 @@ class AppRoutes {
   static const String register = '/register';
   static const String login = '/login';
   static const String home = '/home';
-  static const String consultantSearch = '/consultant-search';
+  static const String entrepreneurSearch = '/entrepreneur-search';
   static const String serviceComparison = '/service-comparison';
   static const String requestStatusNotifications = '/request-status-notifications';
   static const String rateService = '/rate-service';
@@ -46,10 +47,11 @@ class AppRoutes {
   static const String reminders = '/reminders';
   static const String editableProfile = '/editable-profile';
   static const String notifications = '/notifications';
-  static const String startCase = '/start-case';
-  static const String acceptCase = '/accept-case';
-  static const String consultantServices = '/consultant-services';
+  static const String startRequest = '/start-request';
+  static const String acceptRequest = '/accept-request';
+  static const String entrepreneurServices = '/entrepreneur-services';
   static const String performanceMetrics = '/performance-metrics';
+  static const String adviceRequestListScreen = '/advice-request-list-screen';
 
   static Map<String, WidgetBuilder> routes = {
     welcome: (context) => const WelcomeScreen(),
@@ -57,7 +59,7 @@ class AppRoutes {
     register: (context) => const RegisterScreen(),
     login: (context) => const LoginScreen(),
     home: (context) => const HomeScreen(),
-    consultantSearch: (context) => const ConsultantSearchScreen(),
+    entrepreneurSearch: (context) => const EntrepreneurSearchScreen(),
     serviceComparison: (context) => const ServiceComparisonScreen(),
     requestStatusNotifications: (context) => const RequestStatusNotificationScreen(),
     importantAlerts: (context) => const ImportantAlertsScreen(),
@@ -72,10 +74,10 @@ class AppRoutes {
     reviews: (context) => const ReviewsScreen(),
     editableProfile: (context) => const EditableProfileScreen(),
     notifications: (context) => const NotificationListScreen(),
-    startCase: (context) => StartCaseScreen(),
-    acceptCase: (context) => const AcceptCaseScreen(),
-    consultantServices: (context) => const ConsultantServicesScreen(),
+    startRequest: (context) => StartRequestScreen(),
+    acceptRequest: (context) => const AcceptRequestScreen(),
+    entrepreneurServices: (context) => const EntrepreneurServicesScreen(),
     performanceMetrics: (context) => const PerformanceMetricsScreen(),
+    adviceRequestListScreen: (context) => const AdviceRequestListScreen()
   };
 }
-

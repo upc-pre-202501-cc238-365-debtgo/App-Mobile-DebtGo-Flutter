@@ -50,6 +50,7 @@ class NotificationService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasNotification', true);
+    await prefs.setInt('unreadCount', 3);
 
     await _notifications.zonedSchedule(
       id,

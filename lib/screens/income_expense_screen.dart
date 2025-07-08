@@ -122,7 +122,6 @@ class _IncomeExpenseScreenState extends State<IncomeExpenseScreen> {
     final incomeLabel = lang == 'es' ? 'Ingreso' : 'Income';
     final expenseLabel = lang == 'es' ? 'Gasto' : 'Expense';
 
-    //Asegura que el valor de _type exista entre las opciones válidas
     if (_type != incomeLabel && _type != expenseLabel) {
       _type = incomeLabel;
     }
