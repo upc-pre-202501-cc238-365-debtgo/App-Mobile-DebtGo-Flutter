@@ -20,8 +20,8 @@ class PerformanceMetricsScreen extends StatelessWidget {
           children: [
             Text(
               lang == 'es'
-                  ? 'Resumen de tu actividad como consultor'
-                  : 'Summary of your activity as a consultant',
+                  ? 'Resumen de tu actividad como emprendedor'
+                  : 'Summary of your activity as a entrepreneur',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 24),
@@ -38,7 +38,7 @@ class PerformanceMetricsScreen extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           switch (value.toInt()) {
                             case 0:
-                              return Text(lang == 'es' ? 'Asesorías' : 'Consults');
+                              return Text(lang == 'es' ? 'Asesorías' : 'Advisors');
                             case 1:
                               return Text(lang == 'es' ? 'Reseñas' : 'Reviews');
                             case 2:
